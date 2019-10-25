@@ -33,7 +33,7 @@ class RatioController extends Controller
 
 // check if the currencies pair is comprised from different currencies
       if ($validated['currency_from'] == $validated['currency_to']) {
-        return response('Same pair of currencies selected!');
+        return response()->json();
       }
 // check if the pair already exists in the db
       $ratio = Ratio::where('currency_from_id', $validated['currency_from'])
@@ -66,7 +66,7 @@ class RatioController extends Controller
         $ratio2->ratio = (1/$validated['ratio']);
         $ratio2->save();
       }
-      return response('New ratios set!');
+      return response()->json();
     }
 
 }

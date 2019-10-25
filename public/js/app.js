@@ -1944,6 +1944,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   // since we are in a component, our data must be a function
   data: function data() {
@@ -1956,17 +1957,18 @@ __webpack_require__.r(__webpack_exports__);
       ratio: '',
       amount: 1,
       results: '',
-      ratio_changed: false
+      ratio_changed: false,
+      message: ''
     };
   },
   computed: {
-    // a method to treat negative numbers as positive
+    // a computed property to treat negative numbers as positive
     returnAbs: function returnAbs() {
       return Math.abs(this.amount);
     }
   },
   methods: {
-    // a method to toggle the ratio_changed property
+    // a method to check for the ratio_changed property
     ratioChanged: function ratioChanged() {
       if (this.ratio != null || this.radio != '') {
         this.ratio_changed = true;
@@ -1974,13 +1976,20 @@ __webpack_require__.r(__webpack_exports__);
         this.ratio == false;
       }
     },
-    // a method to toggle the currencies_not_same property
+    // a method to check for the currencies_not_same property
     currenciesNotSame: function currenciesNotSame() {
       if (this.currency_from == this.currency_to) {
         this.currencies_not_same = false;
       } else {
         this.currencies_not_same = true;
       }
+    },
+    // a method to reset properties
+    resetProperties: function resetProperties() {
+      this.results = '';
+      this.ratio = '';
+      this.ratio_changed = false;
+      this.currenciesNotSame();
     },
     // a method to produce a list of all currencies
     currenciesList: function currenciesList() {
@@ -1989,7 +1998,7 @@ __webpack_require__.r(__webpack_exports__);
       axios.get('/currencies').then(function (res) {
         _this.currencies = res.data;
       })["catch"](function (err) {
-        console.log(err);
+        _this.message = err.message;
       });
     },
     // a method to fetch a currencies pair ratio
@@ -2000,9 +2009,8 @@ __webpack_require__.r(__webpack_exports__);
       if (this.currency_from != '' && this.currency_to != '') {
         // check if fields contain the same currency
         if (this.currency_from == this.currency_to) {
-          this.results = 'A currency cannot be converted to itself. Please select a different pair of currencies.';
-          this.ratio_changed = false;
-          this.currenciesNotSame();
+          this.message = 'A currency cannot be converted to itself. Please select a different pair of currencies.';
+          this.resetProperties();
         } else {
           // if everything is fine perform the request
           this.currencies_not_same = true;
@@ -2014,50 +2022,68 @@ __webpack_require__.r(__webpack_exports__);
             _this2.ratio = res.data.ratio; // but if the response is empty prompt for a new default ratio
 
             if (_this2.ratio == null || _this2.ratio == '') {
-              _this2.results = 'There is no default ratio for the current pair of currencies. Please enter a default ratio.'; // if not empty perform the conversion and reset properties
+              _this2.message = 'There is no default ratio for the current pair of currencies. Please enter a default ratio.';
+              _this2.results = ''; // if not empty perform the conversion and reset properties
             } else {
               var product = _this2.returnAbs * _this2.ratio;
               _this2.results = product.toFixed(4);
               _this2.ratio_changed = false;
+              _this2.message = '';
             }
           })["catch"](function (err) {
-            console.log(err);
+            _this2.message = err.message;
+
+            _this2.resetProperties();
           });
         }
       }
     },
     // a method to remove currencies from db
     deleteCurrency: function deleteCurrency(id) {
+      var _this3 = this;
+
       axios["delete"]('/currencies/' + id).then(function (res) {
-        console.log(res);
+        _this3.message = 'Currency deleted';
       })["catch"](function (err) {
-        console.log(err);
+        _this3.message = err.message;
+
+        _this3.resetProperties();
       });
       this.currenciesList();
     },
     // a method to insert/update currencies ratios
     setRatio: function setRatio() {
+      var _this4 = this;
+
       axios.post('/ratios/set', {
         currency_from: this.currency_from,
         currency_to: this.currency_to,
         ratio: this.ratio
       }).then(function (res) {
-        console.log(res);
+        _this4.message = 'Ratio set';
       })["catch"](function (err) {
-        console.log(err);
+        _this4.message = err.message;
+
+        _this4.resetProperties();
       });
-      this.results = this.returnAbs * this.ratio;
+      var product = this.returnAbs * this.ratio;
+      this.results = product.toFixed(4);
       this.ratio_changed = false;
     },
     // a method to add new currencies
     addCurrency: function addCurrency() {
+      var _this5 = this;
+
       axios.post('/currencies', {
         name: this.new_currency
       }).then(function (res) {
-        console.log(res);
+        _this5.message = 'Currency added';
       })["catch"](function (err) {
-        console.log(err);
+        _this5.message = err.message;
+
+        _this5.resetProperties();
       });
+      this.new_currency = '';
       this.currenciesList();
     }
   },
@@ -37375,7 +37401,7 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "container" }, [
+  return _c("div", { staticClass: "container mt-5" }, [
     _c("div", { staticClass: "row justify-content-center" }, [
       _c("div", { staticClass: "col-md-8" }, [
         _c("div", { staticClass: "card" }, [
@@ -37443,7 +37469,12 @@ var render = function() {
                   }
                 ],
                 staticClass: "form-control",
-                attrs: { id: "amount", type: "number", name: "amount" },
+                attrs: {
+                  id: "amount",
+                  type: "number",
+                  name: "amount",
+                  required: "required"
+                },
                 domProps: { value: _vm.amount },
                 on: {
                   change: function($event) {
@@ -37526,7 +37557,8 @@ var render = function() {
                       id: "amount",
                       type: "number",
                       name: "ratio",
-                      step: ".1"
+                      step: ".1",
+                      required: "requird"
                     },
                     domProps: { value: _vm.ratio },
                     on: {
@@ -37570,7 +37602,11 @@ var render = function() {
           _c("div", { staticClass: "card-footer" }, [
             _c("p", { staticClass: "py-3" }, [_vm._v("Results")]),
             _vm._v(" "),
-            _c("p", [_vm._v(_vm._s(_vm.results))])
+            _c("p", [_vm._v(_vm._s(_vm.results))]),
+            _vm._v(" "),
+            _c("p", { staticClass: "text-danger" }, [
+              _c("small", [_vm._v(_vm._s(_vm.message))])
+            ])
           ])
         ])
       ])
@@ -37652,7 +37688,8 @@ var render = function() {
                         attrs: {
                           type: "text",
                           name: "new_currency",
-                          placeholder: "enter a new currency"
+                          placeholder: "enter a new currency",
+                          required: "required"
                         },
                         domProps: { value: _vm.new_currency },
                         on: {

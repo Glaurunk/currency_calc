@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Currency extends Model
 {
     public $timestamps = false;
-    protected $fillabe = [
+    protected $fillable = [
       'name'
     ];
 

@@ -20,16 +20,18 @@ class CurrencyController extends Controller
       $validated = $request->validate([
         'name' => 'required|max:20'
       ]);
+
       $currency = new Currency;
       $currency->name = $validated['name'];
       $currency->save();
-      return response('Currency created');
+
+      return response()->json();
     }
 
 
     public function delete($id)
     {
         Currency::find($id)->delete();
-        return response('Currency deleted');
+        return response()->json();
     }
 }

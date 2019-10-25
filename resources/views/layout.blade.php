@@ -13,12 +13,10 @@
     <body>
 <!-- the vue instance goes in here -->
       <div id="app">
-        <div class="container mt-5">
 <!-- our app inside a vue component -->
             <currency></currency>
 
-          </div> <!--here ends container -->
-        </div> <!--here ends app -->
+      </div> <!--here ends app -->
 
 <!-- include vue & bootstrap -->
         <script type="text/javascript" src="js/app.js"></script>

@@ -2,7 +2,7 @@
 <!-- For our AJAX calls We use the axios library because it is already included in laravel -->
 
 <template>
-    <div class="container">
+    <div class="container mt-5">
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <div class="card">
@@ -27,7 +27,7 @@
 
 <!-- We enter the desired amount to be converted -->
                         <label for="ammount" class="mt-3">Amount</label>
-                        <input id="amount" class="form-control" type="number" name="amount" v-model="amount" @change="searchRatio()">
+                        <input id="amount" class="form-control" type="number" name="amount" v-model="amount" @change="searchRatio()" required="required">
 
 <!-- We choose the currency to which we are converting to We use the array in our db to populate the select list -->
                         <label for="currency_to" class="mt-3">Convert TO</label>
@@ -40,7 +40,7 @@
                         <label for="ratio" class="mt-3">Ratio</label>
                         <div class="row form-group">
                           <div class="col">
-                            <input id="amount" class="form-control" type="number" name="ratio" step=".1" v-model="ratio" @change="ratioChanged">
+                            <input id="amount" class="form-control" type="number" name="ratio" step=".1" v-model="ratio" @change="ratioChanged" required="requird">
                           </div>
                           <div class="col ">
                             <button v-if="ratio_changed && currencies_not_same" class="btn btn-sm btn-warning form-control" name="set_ratio" id="set_ratio" type="submit" v-on:click.prevent="setRatio">set as new default ratio</button>
@@ -53,6 +53,7 @@
                     <div class="card-footer">
                       <p class="py-3">Results</p>
                       <p>{{ results }}</p>
+                      <p class="text-danger"><small>{{ message }}</small></p>
                     </div> <!-- here ends card-footer -->
 
                 </div> <!-- here ends card -->
@@ -88,7 +89,7 @@
               <form >
                 <div class="row">
                   <div class="col">
-                    <input type="text" name="new_currency" v-model="new_currency" placeholder="enter a new currency" class="form-control">
+                    <input type="text" name="new_currency" v-model="new_currency" placeholder="enter a new currency" class="form-control" required="required">
                   </div><!-- here ends col -->
                   <div class="col">
                     <button type="button" class="btn btn-primary" v-on:click="addCurrency">add as new currency</button>
@@ -117,17 +118,18 @@
             ratio: '',
             amount: 1,
             results: '',
-            ratio_changed: false
+            ratio_changed: false,
+            message: ''
           }
         },
         computed: {
-// a method to treat negative numbers as positive
+// a computed property to treat negative numbers as positive
           returnAbs: function() {
             return Math.abs(this.amount)
           }
         },
         methods: {
-// a method to toggle the ratio_changed property
+// a method to check for the ratio_changed property
           ratioChanged: function() {
             if (this.ratio != null || this.radio != '') {
               this.ratio_changed = true;
@@ -135,8 +137,7 @@
               this.ratio == false;
             }
           },
-
-// a method to toggle the currencies_not_same property
+// a method to check for the currencies_not_same property
             currenciesNotSame: function() {
               if (this.currency_from == this.currency_to) {
                 this.currencies_not_same = false;
@@ -145,13 +146,21 @@
               }
             },
 
+// a method to reset properties
+              resetProperties: function() {
+                this.results = '';
+                this.ratio = '';
+                this.ratio_changed = false;
+                this.currenciesNotSame();
+              },
+
 // a method to produce a list of all currencies
           currenciesList: function() {
             axios.get('/currencies')
             .then((res) => {
               this.currencies = res.data;
             }).catch((err) => {
-              console.log(err);
+              this.message = err.message;
             });
           },
 
@@ -161,9 +170,8 @@
             if (this.currency_from != '' && this.currency_to != '') {
 // check if fields contain the same currency
               if (this.currency_from == this.currency_to) {
-                this.results = 'A currency cannot be converted to itself. Please select a different pair of currencies.'
-                this.ratio_changed = false;
-                this.currenciesNotSame();
+                this.message = 'A currency cannot be converted to itself. Please select a different pair of currencies.'
+                this.resetProperties();
               } else {
 // if everything is fine perform the request
                 this.currencies_not_same = true;
@@ -176,15 +184,18 @@
                     this.ratio = res.data.ratio;
 // but if the response is empty prompt for a new default ratio
                     if (this.ratio == null || this.ratio == '') {
-                      this.results = 'There is no default ratio for the current pair of currencies. Please enter a default ratio.'
+                      this.message = 'There is no default ratio for the current pair of currencies. Please enter a default ratio.'
+                      this.results = '';
 // if not empty perform the conversion and reset properties
                       } else {
                         let product = this.returnAbs * this.ratio;
                         this.results = product.toFixed(4);
                         this.ratio_changed = false;
+                        this.message = '';
                     }
                   }).catch((err) => {
-                    console.log(err);
+                    this.message = err.message;
+                    this.resetProperties();
                   });
               }
             }
@@ -194,9 +205,10 @@
           deleteCurrency: function(id) {
             axios.delete('/currencies/' + id)
             .then((res) => {
-              console.log(res);
+              this.message = 'Currency deleted';
             }).catch((err) => {
-              console.log(err);
+              this.message = err.message;
+              this.resetProperties();
             });
             this.currenciesList();
           },
@@ -208,11 +220,13 @@
                 currency_to: this.currency_to,
                 ratio: this.ratio
               }).then((res) => {
-                console.log(res);
+                this.message = 'Ratio set';
               }).catch((err) => {
-                console.log(err);
+                this.message = err.message;
+                this.resetProperties();
               });
-              this.results = this.returnAbs * this.ratio;
+              let product = this.returnAbs * this.ratio;
+              this.results = product.toFixed(4);
               this.ratio_changed = false;
           },
 
@@ -221,10 +235,12 @@
             axios.post('/currencies', {
               name: this.new_currency
             }).then((res) => {
-              console.log(res);
+              this.message = 'Currency added';
             }).catch((err) => {
-              console.log(err);
+              this.message = err.message;
+              this.resetProperties();
             });
+            this.new_currency = '';
             this.currenciesList();
           }
 
