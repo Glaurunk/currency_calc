@@ -1,6 +1,6 @@
 <h3>Case Study: Currency calculator with php and Javascript</h3>
 
-<p>The original task was to create a php currency calculator. However I was given specific instructions to use mainly Javascript. So, how would be a project based on Javascript front with php back? Laravel/Vue Js was the answer for me, though maybe a bit of an overkill.</p>
+<p>The original task was to create a php currency calculator. However I was given specific instructions to use mainly Javascript. So, how would be a project based on Javascript front end with php back end? Laravel/Vue Js came immediately to mind, as these are currently my favourite frameworks for these technologies.</p>
 </p>The entire app was designed as a reactive single page application, with as much Javascript as possible and as less php as possible. Since Laravel comes with axios I used it for my AJAX calls.</p>
 <p>There is no external api to feed the currency ratios, they are drawn from the database. The app stores the ratio for a given pair of currencies and the user, along withe pair of currencies can enter the desired amount to be calculated. New currencies can be added and old ones deleted via a modal panel. The ratios can be modified at any time if the default value is changed manually or a new pair without default data has been selected. However the new ratio must be set as default (persist to the database) in order to show new results. All operations are performed asynchronously.</p>
 </p>As always, feel free to make any suggestions if you care :)</p>
