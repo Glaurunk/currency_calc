@@ -179,7 +179,8 @@
                       this.results = 'There is no default ratio for the current pair of currencies. Please enter a default ratio.'
 // if not empty perform the conversion and reset properties
                       } else {
-                        this.results = this.returnAbs * this.ratio;
+                        let product = this.returnAbs * this.ratio;
+                        this.results = product.toFixed(4);
                         this.ratio_changed = false;
                     }
                   }).catch((err) => {

@@ -2016,7 +2016,8 @@ __webpack_require__.r(__webpack_exports__);
             if (_this2.ratio == null || _this2.ratio == '') {
               _this2.results = 'There is no default ratio for the current pair of currencies. Please enter a default ratio.'; // if not empty perform the conversion and reset properties
             } else {
-              _this2.results = _this2.returnAbs * _this2.ratio;
+              var product = _this2.returnAbs * _this2.ratio;
+              _this2.results = product.toFixed(4);
               _this2.ratio_changed = false;
             }
           })["catch"](function (err) {
