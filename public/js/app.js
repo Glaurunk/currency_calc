@@ -1952,6 +1952,7 @@ __webpack_require__.r(__webpack_exports__);
       currency_from: '',
       currency_to: '',
       new_currency: '',
+      currencies_not_same: false,
       ratio: '',
       amount: 1,
       results: '',
@@ -1973,6 +1974,14 @@ __webpack_require__.r(__webpack_exports__);
         this.ratio == false;
       }
     },
+    // a method to toggle the currencies_not_same property
+    currenciesNotSame: function currenciesNotSame() {
+      if (this.currency_from == this.currency_to) {
+        this.currencies_not_same = false;
+      } else {
+        this.currencies_not_same = true;
+      }
+    },
     // a method to produce a list of all currencies
     currenciesList: function currenciesList() {
       var _this = this;
@@ -1992,8 +2001,11 @@ __webpack_require__.r(__webpack_exports__);
         // check if fields contain the same currency
         if (this.currency_from == this.currency_to) {
           this.results = 'A currency cannot be converted to itself. Please select a different pair of currencies.';
+          this.ratio_changed = false;
+          this.currenciesNotSame();
         } else {
           // if everything is fine perform the request
+          this.currencies_not_same = true;
           axios.post('/ratios', {
             currency_from: this.currency_from,
             currency_to: this.currency_to
@@ -2002,8 +2014,7 @@ __webpack_require__.r(__webpack_exports__);
             _this2.ratio = res.data.ratio; // but if the response is empty prompt for a new default ratio
 
             if (_this2.ratio == null || _this2.ratio == '') {
-              _this2.results = 'There is no default ratio for the current pair of currencies. Please enter a default ratio.';
-              _this2.ratio_changed = false; // if not empty perform the conversion and reset properties
+              _this2.results = 'There is no default ratio for the current pair of currencies. Please enter a default ratio.'; // if not empty perform the conversion and reset properties
             } else {
               _this2.results = _this2.returnAbs * _this2.ratio;
               _this2.ratio_changed = false;
@@ -37530,7 +37541,7 @@ var render = function() {
                 ]),
                 _vm._v(" "),
                 _c("div", { staticClass: "col " }, [
-                  _vm.ratio_changed
+                  _vm.ratio_changed && _vm.currencies_not_same
                     ? _c(
                         "button",
                         {

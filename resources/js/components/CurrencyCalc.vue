@@ -43,7 +43,7 @@
                             <input id="amount" class="form-control" type="number" name="ratio" step=".1" v-model="ratio" @change="ratioChanged">
                           </div>
                           <div class="col ">
-                            <button v-if="ratio_changed" class="btn btn-sm btn-warning form-control" name="set_ratio" id="set_ratio" type="submit" v-on:click.prevent="setRatio">set as new default ratio</button>
+                            <button v-if="ratio_changed && currencies_not_same" class="btn btn-sm btn-warning form-control" name="set_ratio" id="set_ratio" type="submit" v-on:click.prevent="setRatio">set as new default ratio</button>
                           </div><!-- here ends col -->
                         </div><!-- here ends row -->
 
@@ -113,6 +113,7 @@
             currency_from: '',
             currency_to: '',
             new_currency: '',
+            currencies_not_same: false,
             ratio: '',
             amount: 1,
             results: '',
@@ -128,12 +129,21 @@
         methods: {
 // a method to toggle the ratio_changed property
           ratioChanged: function() {
-            if(this.ratio != null || this.radio != '') {
+            if (this.ratio != null || this.radio != '') {
               this.ratio_changed = true;
             } else {
               this.ratio == false;
             }
           },
+
+// a method to toggle the currencies_not_same property
+            currenciesNotSame: function() {
+              if (this.currency_from == this.currency_to) {
+                this.currencies_not_same = false;
+              } else {
+                this.currencies_not_same = true;
+              }
+            },
 
 // a method to produce a list of all currencies
           currenciesList: function() {
@@ -152,8 +162,11 @@
 // check if fields contain the same currency
               if (this.currency_from == this.currency_to) {
                 this.results = 'A currency cannot be converted to itself. Please select a different pair of currencies.'
+                this.ratio_changed = false;
+                this.currenciesNotSame();
               } else {
 // if everything is fine perform the request
+                this.currencies_not_same = true;
                 axios.post('/ratios', {
                     currency_from: this.currency_from,
                     currency_to: this.currency_to,
@@ -164,7 +177,6 @@
 // but if the response is empty prompt for a new default ratio
                     if (this.ratio == null || this.ratio == '') {
                       this.results = 'There is no default ratio for the current pair of currencies. Please enter a default ratio.'
-                      this.ratio_changed = false;
 // if not empty perform the conversion and reset properties
                       } else {
                         this.results = this.returnAbs * this.ratio;
