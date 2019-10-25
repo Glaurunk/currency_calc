@@ -23,6 +23,6 @@ class RatiosTableSeeder extends Seeder
       DB::table('ratios')->insert(['currency_from_id' => '5', 'currency_to_id' => '1', 'ratio' => '1.1453']);
       DB::table('ratios')->insert(['currency_from_id' => '4', 'currency_to_id' => '2', 'ratio' => '0.0130']);
       DB::table('ratios')->insert(['currency_from_id' => '5', 'currency_to_id' => '3', 'ratio' => '0.8788']);
-      DB::table('ratios')->insert(['currency_from_id' => '6', 'currency_to_id' => '5', 'ratio' => '1.6390']);
+      DB::table('ratios')->insert(['currency_from_id' => '6', 'currency_to_id' => '5', 'ratio' => '0.6390']);
     }
 }
