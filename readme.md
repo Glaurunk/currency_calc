@@ -5,7 +5,7 @@
 <p>There is no external api to feed the currency ratios, they are drawn from the database. The app stores the ratio for a given pair of currencies and the user, along withe pair of currencies can enter the desired amount to be calculated. New currencies can be added and old ones deleted via a modal panel. The ratios can be modified at any time if the default value is changed manually or a new pair without default data has been selected. All operations are performed asynchronously.</p>
 </p>As always, feel free to make any suggestions if you care :)</p>
 
-<p><strong>In order to run the app you will need of course a server and a database. Do not forget to run the migrations and seed the database afterwards, seeders have been prepared fro you!</strong></p>
+<p><strong>In order to run the app you will need of course a server and a database. Do not forget to run the migrations and seed the database afterwards, seeders have been prepared for you!</strong></p>
 
 <h3>Task Description</h3>
 <em>
